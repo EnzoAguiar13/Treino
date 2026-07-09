@@ -39,6 +39,7 @@ export interface Affiliate {
   deposits: string | number;
   volume: string | number;
   netPl: string | number;
+  ggr: string | number;
   commission: string | number;
   cpa: string | number;
   revShare: string | number;
@@ -48,6 +49,7 @@ export interface Affiliate {
   roi: string | number;
   cac: string | number;
   profit: string | number;
+  ggrMargin: string | number;
   notes: string;
   categories: { id: string; category: Category }[];
   socialAccounts: SocialAccount[];
@@ -66,6 +68,8 @@ export interface DashboardOverview {
   ftd: number;
   volume: number;
   netPl: number;
+  ggr: number;
+  ggrMargin: number;
   investment: number;
   commission: number;
   profit: number;

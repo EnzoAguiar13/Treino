@@ -39,6 +39,7 @@ const FINANCIAL_FIELDS: { key: keyof Affiliate; label: string; int?: boolean }[]
   { key: 'deposits', label: 'Depósito (R$)' },
   { key: 'volume', label: 'Volume (R$)' },
   { key: 'netPl', label: 'Net P&L (R$)' },
+  { key: 'ggr', label: 'GGR (R$)' },
   { key: 'cpa', label: 'CPA (R$)' },
   { key: 'revShare', label: 'RevShare (%)' },
   { key: 'fixedCost', label: 'Fixo (R$)' },
@@ -105,11 +106,13 @@ export default function AffiliateDetailPage() {
       </div>
 
       {/* Indicadores recalculados automaticamente */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <StatCard label="ROI" value={pct(a.roi)} index={0} />
         <StatCard label="CAC" value={brl(a.cac)} index={1} />
-        <StatCard label="Lucro" value={brl(a.profit)} index={2} />
-        <StatCard label="Comissão" value={brl(a.commission)} index={3} />
+        <StatCard label="GGR" value={brl(a.ggr)} index={2} />
+        <StatCard label="Margem GGR" value={pct(a.ggrMargin)} index={3} />
+        <StatCard label="Lucro" value={brl(a.profit)} index={4} />
+        <StatCard label="Comissão" value={brl(a.commission)} index={5} />
       </div>
 
       <section className="card p-5">

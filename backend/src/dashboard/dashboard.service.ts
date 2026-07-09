@@ -39,11 +39,14 @@ export class DashboardService {
     const registrations = sum('registrations');
     const ftd = sum('ftd');
     const netPl = sum('netPl');
+    const ggr = sum('ggr');
     const commission = sum('commission');
     const trafficInvestment = sum('trafficInvestment');
     const otherCosts = sum('otherCosts');
     const investment = trafficInvestment + otherCosts + commission;
-    const profit = netPl - investment;
+    // Resultado bruto sobre GGR quando informado; senão Net P&L
+    const grossResult = ggr > 0 ? ggr : netPl;
+    const profit = grossResult - investment;
     const expenses = Number(expensesAgg._sum.amount ?? 0);
 
     return {
@@ -56,6 +59,8 @@ export class DashboardService {
       ftd,
       volume: sum('volume'),
       netPl,
+      ggr,
+      ggrMargin: ggr > 0 ? profit / ggr : 0,
       investment,
       commission,
       profit,

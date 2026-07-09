@@ -53,6 +53,8 @@ export default function DashboardPage() {
         ['FTD', num(d.ftd)],
         ['Volume', brl(d.volume)],
         ['Net P&L', brl(d.netPl)],
+        ['GGR', brl(d.ggr)],
+        ['Margem GGR', pct(d.ggrMargin)],
         ['Investimento', brl(d.investment)],
         ['Comissão', brl(d.commission)],
         ['Lucro', brl(d.profit)],

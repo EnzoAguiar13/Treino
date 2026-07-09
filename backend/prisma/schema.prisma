@@ -99,6 +99,7 @@ model Affiliate {
   deposits          Decimal             @default(0) @db.Decimal(18, 2)
   volume            Decimal             @default(0) @db.Decimal(18, 2)
   netPl             Decimal             @default(0) @db.Decimal(18, 2)
+  ggr               Decimal             @default(0) @db.Decimal(18, 2)
   commission        Decimal             @default(0) @db.Decimal(18, 2)
   cpa               Decimal             @default(0) @db.Decimal(18, 2)
   revShare          Decimal             @default(0) @db.Decimal(18, 2)
@@ -109,6 +110,7 @@ model Affiliate {
   roi               Decimal             @default(0) @db.Decimal(18, 4)
   cac               Decimal             @default(0) @db.Decimal(18, 2)
   profit            Decimal             @default(0) @db.Decimal(18, 2)
+  ggrMargin         Decimal             @default(0) @db.Decimal(18, 4)
   notes             String              @default("")
   categories        AffiliateCategory[]
   socialAccounts    SocialAccount[]

@@ -13,10 +13,12 @@ const COLUMNS: { key: string; header: string }[] = [
   { key: 'deposits', header: 'Depósitos' },
   { key: 'volume', header: 'Volume' },
   { key: 'netPl', header: 'Net P&L' },
+  { key: 'ggr', header: 'GGR' },
   { key: 'commission', header: 'Comissão' },
   { key: 'trafficInvestment', header: 'Investimento' },
   { key: 'roi', header: 'ROI' },
   { key: 'cac', header: 'CAC' },
+  { key: 'ggrMargin', header: 'Margem GGR' },
   { key: 'profit', header: 'Lucro' },
 ];
 
@@ -35,6 +37,8 @@ export class ReportsService {
       deposits: Number(a.deposits),
       volume: Number(a.volume),
       netPl: Number(a.netPl),
+      ggr: Number(a.ggr),
+      ggrMargin: Number(a.ggrMargin),
       commission: Number(a.commission),
       trafficInvestment: Number(a.trafficInvestment),
       roi: Number(a.roi),

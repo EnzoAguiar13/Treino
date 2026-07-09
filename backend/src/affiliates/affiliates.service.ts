@@ -26,6 +26,7 @@ const FINANCIAL_FIELDS = [
   'deposits',
   'volume',
   'netPl',
+  'ggr',
   'cpa',
   'revShare',
   'fixedCost',
@@ -156,6 +157,7 @@ export class AffiliatesService {
       data.roi = ind.roi;
       data.cac = ind.cac;
       data.profit = ind.profit;
+      data.ggrMargin = ind.ggrMargin;
     }
 
     const updated = await this.prisma.$transaction(async (tx) => {

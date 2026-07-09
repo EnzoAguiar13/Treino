@@ -91,6 +91,7 @@ export class UpdateAffiliateDto {
   @IsOptional() @IsNumber() deposits?: number;
   @IsOptional() @IsNumber() volume?: number;
   @IsOptional() @IsNumber() netPl?: number;
+  @IsOptional() @IsNumber() ggr?: number;
   @IsOptional() @IsNumber() @Min(0) cpa?: number;
   @IsOptional() @IsNumber() @Min(0) revShare?: number;
   @IsOptional() @IsNumber() @Min(0) fixedCost?: number;
