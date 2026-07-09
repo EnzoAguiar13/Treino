@@ -1,0 +1,394 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Usuários, papéis e permissões ----------
+
+model Role {
+  id          String           @id @default(uuid())
+  name        String           @unique // ADMINISTRADOR, FINANCEIRO, CS, GESTOR, MARKETING, TRAFEGO, VISUALIZACAO
+  label       String
+  users       User[]
+  permissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id    String           @id @default(uuid())
+  key   String           @unique
+  label String
+  roles RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model User {
+  id               String         @id @default(uuid())
+  name             String
+  email            String         @unique
+  passwordHash     String
+  refreshTokenHash String?
+  active           Boolean        @default(true)
+  roleId           String
+  role             Role           @relation(fields: [roleId], references: [id])
+  notifications    Notification[]
+  logs             Log[]
+  histories        History[]
+  uploads          Upload[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@map("users")
+}
+
+// ---------- Afiliados ----------
+
+enum AffiliateStatus {
+  ATIVO
+  INATIVO
+}
+
+enum Category {
+  CREATOR
+  CASSINO
+  SPORTSBOOK
+  INFLUENCER
+  STREAMER
+  TIPSTER
+  TRADER
+}
+
+enum SocialNetwork {
+  INSTAGRAM
+  TIKTOK
+  YOUTUBE
+  TELEGRAM
+  WHATSAPP
+  DISCORD
+  FACEBOOK
+  TWITTER
+  KWAI
+  SITE
+  LINKTREE
+}
+
+model Affiliate {
+  id                String              @id @default(uuid())
+  externalId        String              @unique // ID interno EsportivaBet
+  name              String
+  status            AffiliateStatus     @default(ATIVO)
+  // Financeiro (agregado atual, recalculado automaticamente)
+  registrations     Int                 @default(0)
+  ftd               Int                 @default(0)
+  deposits          Decimal             @default(0) @db.Decimal(18, 2)
+  volume            Decimal             @default(0) @db.Decimal(18, 2)
+  netPl             Decimal             @default(0) @db.Decimal(18, 2)
+  commission        Decimal             @default(0) @db.Decimal(18, 2)
+  cpa               Decimal             @default(0) @db.Decimal(18, 2)
+  revShare          Decimal             @default(0) @db.Decimal(18, 2)
+  fixedCost         Decimal             @default(0) @db.Decimal(18, 2)
+  otherCosts        Decimal             @default(0) @db.Decimal(18, 2)
+  trafficInvestment Decimal             @default(0) @db.Decimal(18, 2)
+  // Indicadores calculados (persistidos para consulta rápida)
+  roi               Decimal             @default(0) @db.Decimal(18, 4)
+  cac               Decimal             @default(0) @db.Decimal(18, 2)
+  profit            Decimal             @default(0) @db.Decimal(18, 2)
+  notes             String              @default("")
+  categories        AffiliateCategory[]
+  socialAccounts    SocialAccount[]
+  agreement         Agreement?
+  creatorMetrics    CreatorMetric[]
+  casinoMetrics     CasinoMetric[]
+  sportsbookMetrics SportsbookMetric[]
+  traffic           Traffic[]
+  commissions       Commission[]
+  expenses          Expense[]
+  depositEntries    Deposit[]
+  registrationRows  Registration[]
+  netPlEntries      NetPlEntry[]
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  @@map("affiliates")
+}
+
+model AffiliateCategory {
+  id          String    @id @default(uuid())
+  affiliateId String
+  category    Category
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  @@unique([affiliateId, category])
+  @@map("affiliate_categories")
+}
+
+model SocialAccount {
+  id          String        @id @default(uuid())
+  affiliateId String
+  network     SocialNetwork
+  handle      String
+  url         String        @default("")
+  followers   Int           @default(0)
+  connected   Boolean       @default(false) // API oficial conectada
+  affiliate   Affiliate     @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  updatedAt   DateTime      @updatedAt
+
+  @@unique([affiliateId, network])
+  @@map("social_accounts")
+}
+
+model Agreement {
+  id          String    @id @default(uuid())
+  affiliateId String    @unique
+  content     String    @default("") // rich text (HTML sanitizado)
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  updatedAt   DateTime  @updatedAt
+
+  @@map("agreements")
+}
+
+// ---------- Métricas por painel ----------
+
+model CreatorMetric {
+  id            String    @id @default(uuid())
+  affiliateId   String
+  date          DateTime  @default(now())
+  followers     Int       @default(0)
+  stories       Int       @default(0)
+  reels         Int       @default(0)
+  posts         Int       @default(0)
+  views         Int       @default(0)
+  engagement    Decimal   @default(0) @db.Decimal(8, 4)
+  clicks        Int       @default(0)
+  registrations Int       @default(0)
+  ftd           Int       @default(0)
+  deposits      Decimal   @default(0) @db.Decimal(18, 2)
+  volume        Decimal   @default(0) @db.Decimal(18, 2)
+  netPl         Decimal   @default(0) @db.Decimal(18, 2)
+  commission    Decimal   @default(0) @db.Decimal(18, 2)
+  affiliate     Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  @@index([affiliateId, date])
+  @@map("creator_metrics")
+}
+
+model CasinoMetric {
+  id          String    @id @default(uuid())
+  affiliateId String
+  date        DateTime  @default(now())
+  ftd         Int       @default(0)
+  volume      Decimal   @default(0) @db.Decimal(18, 2)
+  netPl       Decimal   @default(0) @db.Decimal(18, 2)
+  profit      Decimal   @default(0) @db.Decimal(18, 2)
+  roi         Decimal   @default(0) @db.Decimal(18, 4)
+  commission  Decimal   @default(0) @db.Decimal(18, 2)
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  @@index([affiliateId, date])
+  @@map("casino_metrics")
+}
+
+model SportsbookMetric {
+  id          String    @id @default(uuid())
+  affiliateId String
+  date        DateTime  @default(now())
+  volume      Decimal   @default(0) @db.Decimal(18, 2)
+  bets        Int       @default(0)
+  profit      Decimal   @default(0) @db.Decimal(18, 2)
+  netPl       Decimal   @default(0) @db.Decimal(18, 2)
+  roi         Decimal   @default(0) @db.Decimal(18, 4)
+  commission  Decimal   @default(0) @db.Decimal(18, 2)
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  @@index([affiliateId, date])
+  @@map("sportsbook_metrics")
+}
+
+// ---------- Tráfego ----------
+
+enum AdPlatform {
+  FACEBOOK_ADS
+  GOOGLE_ADS
+  TIKTOK_ADS
+  META_ADS
+  KWAI_ADS
+}
+
+model Traffic {
+  id            String     @id @default(uuid())
+  affiliateId   String?
+  platform      AdPlatform
+  date          DateTime   @default(now())
+  investment    Decimal    @default(0) @db.Decimal(18, 2)
+  clicks        Int        @default(0)
+  leads         Int        @default(0)
+  registrations Int        @default(0)
+  ftd           Int        @default(0)
+  // Indicadores calculados automaticamente
+  cpa           Decimal    @default(0) @db.Decimal(18, 2)
+  cac           Decimal    @default(0) @db.Decimal(18, 2)
+  roi           Decimal    @default(0) @db.Decimal(18, 4)
+  profit        Decimal    @default(0) @db.Decimal(18, 2)
+  revenue       Decimal    @default(0) @db.Decimal(18, 2)
+  affiliate     Affiliate? @relation(fields: [affiliateId], references: [id], onDelete: SetNull)
+
+  @@index([platform, date])
+  @@map("traffic")
+}
+
+// ---------- Financeiro ----------
+
+enum CommissionType {
+  CPA
+  REVSHARE
+  FIXO
+  OUTRO
+}
+
+model Commission {
+  id          String         @id @default(uuid())
+  affiliateId String
+  type        CommissionType
+  amount      Decimal        @default(0) @db.Decimal(18, 2)
+  description String         @default("")
+  date        DateTime       @default(now())
+  affiliate   Affiliate      @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  @@index([affiliateId, date])
+  @@map("commissions")
+}
+
+model Expense {
+  id          String     @id @default(uuid())
+  affiliateId String?
+  description String
+  category    String     @default("GERAL")
+  amount      Decimal    @default(0) @db.Decimal(18, 2)
+  date        DateTime   @default(now())
+  affiliate   Affiliate? @relation(fields: [affiliateId], references: [id], onDelete: SetNull)
+
+  @@index([date])
+  @@map("expenses")
+}
+
+model Deposit {
+  id          String    @id @default(uuid())
+  affiliateId String
+  amount      Decimal   @default(0) @db.Decimal(18, 2)
+  isFtd       Boolean   @default(false)
+  date        DateTime  @default(now())
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  @@index([affiliateId, date])
+  @@map("deposits")
+}
+
+model Registration {
+  id          String    @id @default(uuid())
+  affiliateId String
+  count       Int       @default(1)
+  date        DateTime  @default(now())
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  @@index([affiliateId, date])
+  @@map("registrations")
+}
+
+model NetPlEntry {
+  id          String    @id @default(uuid())
+  affiliateId String
+  source      String    @default("GERAL") // CASSINO | SPORTSBOOK | GERAL
+  amount      Decimal   @default(0) @db.Decimal(18, 2)
+  date        DateTime  @default(now())
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  @@index([affiliateId, date])
+  @@map("net_pl")
+}
+
+// ---------- Sistema ----------
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String?
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@map("notifications")
+}
+
+model Log {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String
+  entity    String
+  entityId  String   @default("")
+  ip        String   @default("")
+  device    String   @default("")
+  meta      Json?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([entity, createdAt])
+  @@map("logs")
+}
+
+// Histórico imutável de alterações — nunca apagar.
+model History {
+  id        String   @id @default(uuid())
+  userId    String?
+  userName  String   @default("")
+  entity    String
+  entityId  String
+  field     String
+  oldValue  String   @default("")
+  newValue  String   @default("")
+  ip        String   @default("")
+  device    String   @default("")
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([entity, entityId, createdAt])
+  @@map("history")
+}
+
+model Upload {
+  id           String   @id @default(uuid())
+  filename     String
+  url          String
+  mimeType     String
+  size         Int
+  uploadedById String?
+  createdAt    DateTime @default(now())
+  uploadedBy   User?    @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  @@map("uploads")
+}
+
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}

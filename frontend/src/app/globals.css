@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+  background: #0b0b0b;
+  color: #ffffff;
+  font-feature-settings: 'cv11', 'ss01';
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #333 transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #2c2c2c;
+  border-radius: 8px;
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-line bg-panel shadow-card;
+  }
+  .input {
+    @apply w-full rounded-xl border border-line bg-ink px-3 py-2 text-sm text-white outline-none transition placeholder:text-neutral-600 focus:border-brand/70 focus:shadow-glow;
+  }
+  .btn-brand {
+    @apply inline-flex items-center gap-2 rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 active:scale-[.98] disabled:opacity-50;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 rounded-xl border border-line bg-transparent px-4 py-2 text-sm text-neutral-300 transition hover:border-brand/50 hover:text-white;
+  }
+  .chip {
+    @apply inline-flex cursor-pointer items-center rounded-full border border-line px-3 py-1 text-xs text-neutral-300 transition hover:border-brand/60;
+  }
+  .chip-active {
+    @apply border-brand bg-brand/15 text-brand;
+  }
+}
