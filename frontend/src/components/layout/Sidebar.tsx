@@ -17,9 +17,11 @@ import {
   IconUsers,
   IconWallet,
 } from '../Icons';
+import { KanbanSquare } from 'lucide-react';
 
 const ITEMS: { href: string; label: string; icon: ComponentType<SVGProps<SVGSVGElement>> }[] = [
   { href: '/', label: 'Dashboard', icon: IconDashboard },
+  { href: '/deals', label: 'Deals & Trello', icon: KanbanSquare },
   { href: '/afiliados', label: 'Afiliados', icon: IconUsers },
   { href: '/creators', label: 'Creators', icon: IconStar },
   { href: '/cassino', label: 'Cassino', icon: IconDice },
