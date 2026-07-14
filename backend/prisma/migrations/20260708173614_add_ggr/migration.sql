@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "affiliates" ADD COLUMN     "ggr" DECIMAL(18,2) NOT NULL DEFAULT 0,
+ADD COLUMN     "ggrMargin" DECIMAL(18,4) NOT NULL DEFAULT 0;
