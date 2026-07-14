@@ -1,18 +1,16 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { Handshake, KanbanSquare, Sparkles, type LucideIcon } from 'lucide-react';
+import { Handshake, Sparkles, type LucideIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { AffiliatesTab } from '@/components/deals/AffiliatesTab';
 import { CreatorsTab } from '@/components/deals/CreatorsTab';
-import { KanbanTab } from '@/components/deals/KanbanTab';
 
-type TabKey = 'afiliados' | 'creators' | 'trello';
+type TabKey = 'afiliados' | 'creators';
 
 const TABS: { key: TabKey; label: string; icon: LucideIcon }[] = [
   { key: 'afiliados', label: 'Afiliados', icon: Handshake },
   { key: 'creators', label: 'Creators', icon: Sparkles },
-  { key: 'trello', label: 'Trello', icon: KanbanSquare },
 ];
 
 export default function DealsPage() {
@@ -27,7 +25,7 @@ export default function DealsPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Deals & Creators</h1>
         <p className="text-sm text-neutral-500">
-          Gestão de deals, creators e quadro Trello — tudo editável inline e salvo automaticamente.
+          Gestão de deals e creators — tudo editável inline e salvo automaticamente.
         </p>
       </div>
 
@@ -67,7 +65,6 @@ export default function DealsPage() {
           >
             {tab === 'afiliados' && <AffiliatesTab />}
             {tab === 'creators' && <CreatorsTab />}
-            {tab === 'trello' && <KanbanTab />}
           </motion.div>
         </AnimatePresence>
       )}
